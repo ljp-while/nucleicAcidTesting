@@ -8,7 +8,7 @@ uint16_t threshold = 0;
 uint16_t topLine = 0;
 uint16_t bottomLine = 0;
 uint16_t charXlocation[2][2] = {{0,0}};
-
+RunMode currentMode;
 
 static void draw_vertical_line(uint16_t top, uint16_t left, uint16_t right, uint8_t *buff)
 {
@@ -207,9 +207,9 @@ uint8_t char_location(uint16_t width, uint16_t height, int x0, int y0, int w, in
 //	draw_vertical_line(y0,charXlocation[1][0],charXlocation[1][1],buff);
 //	draw_vertical_line(topLine + 57,charXlocation[0][0] + C_DETECTION_AREA_LEFT,charXlocation[0][0] + C_DETECTION_AREA_RIGHT,buff);
 //	draw_vertical_line(topLine + 57,charXlocation[1][0] + C_DETECTION_AREA_LEFT,charXlocation[1][0] + C_DETECTION_AREA_RIGHT,buff);
-//	printf("y0 =%d y0 + h=%d\r\n",y0, y0 + h);
-//	printf("topLine =%d bottomLine=%d\r\n",topLine, bottomLine);
-//	printf("charXlocation = %d %d %d %d\r\n",charXlocation[0][0], charXlocation[0][1], charXlocation[1][0], charXlocation[1][1]);	
+//	_DEBUG_PRINT_("y0 =%d y0 + h=%d\r\n",y0, y0 + h);
+//	_DEBUG_PRINT_("topLine =%d bottomLine=%d\r\n",topLine, bottomLine);
+//	_DEBUG_PRINT_("charXlocation = %d %d %d %d\r\n",charXlocation[0][0], charXlocation[0][1], charXlocation[1][0], charXlocation[1][1]);	
 
 	if(topLine < y0 || topLine > y0 + h)
 	{
@@ -299,7 +299,7 @@ uint8_t t_gray_value_statistics(uint16_t width, uint16_t height, int x0, int y0,
 		rt = 0;
 	}
 
-	printf("T  grayValue = %d gray = %d %d\r\n",grayValue, gray, gray - grayValue);
+	_DEBUG_PRINT_("T  grayValue = %d gray = %d %d\r\n",grayValue, gray, gray - grayValue);
 	return rt;
 }
 
@@ -367,7 +367,7 @@ uint8_t c_gray_value_statistics(uint16_t width, uint16_t height, int x0, int y0,
 		rt = 0;
 	}
 
-	printf("C  grayValue = %d gray = %d %d\r\n",grayValue, gray, gray - grayValue);
+	_DEBUG_PRINT_("C  grayValue = %d gray = %d %d\r\n",grayValue, gray, gray - grayValue);
 	return rt;
 }
 
@@ -394,14 +394,6 @@ static void char_segmentation(uint16_t width, uint16_t height, int x0, int y0, i
 		}				
 	}
 		char_X_coordinate_location(saltusBuff, sizeof(saltusBuff));
-//		printf("charXlocation = %d  %d %d %d\r\n", charXlocation[0][0], charXlocation[0][1], charXlocation[1][0], charXlocation[1][1]);
-//		for(rows = x0; rows < x0 + w; rows++)
-//		{	
-//			printf("rows = %d saltusBuff = %d\r\n", rows, saltusBuff[rows]);
-//		}
-//		LCD_ShowPicture(0, line, width, 1, dataBuff);   //显示一行
-		
-	
 }
 	
 static void char_X_coordinate_location(uint8_t *buff, uint16_t size)
@@ -473,24 +465,12 @@ static void top_bottom_location(uint16_t width, uint16_t height, int x0, int y0,
 			{
 				saltusBuff[line]++;
 			}
-			colorNext = color;
-			
-//			color = (dataBuff[rows * 2 + 1] << 8) | dataBuff[rows * 2];
-//			color = color > thresholdValue ? 0xffff : 0;
-//			dataBuff[rows * 2] = color & 0xff;
-//			dataBuff[rows * 2 + 1] = (color >> 8) & 0xff;				
+			colorNext = color;			
 		}
-//		LCD_ShowPicture(0, line, width, 1, dataBuff);   //显示一行
 		
 	}	
 	find_top_line(saltusBuff, sizeof(saltusBuff));
 	fine_bottom_line(saltusBuff, sizeof(saltusBuff));
-
-//	printf("topLine = %d bottomLine = %d\r\n", topLine, bottomLine);	
-//	for(line = 0; line < 240; line++)
-//	{	
-//		printf("line = %d saltusBuff = %d\r\n", line, saltusBuff[line]);
-//	}
 }
 
 static void find_top_line(uint8_t *buff, uint8_t size)
@@ -602,20 +582,6 @@ void histogram_distribution(int width, int heigth, int x0, int y0, int w, int h,
 		}
 	}
 	otsu_function(w, h, pixel);
-//	printf("threshold = %d\r\n",threshold);
-//	for(line = 0; line < heigth; line++)
-//	{
-//		EN25QXX_Read((uint8_t*)dataBuff,line*width*2,width*2);  //读取一行
-//		for(rows = 0; rows < width; rows++)
-//		{
-//			color = (dataBuff[rows * 2 + 1] << 8) | dataBuff[rows * 2];
-//			pixel[color/256]++;						//将16bit位像素点  缩小为8bit
-//		}
-
-//		LCD_ShowPicture(0, line, width, 1, dataBuff);   //显示一行
-//	}	
-//	otsu_function(width, heigth, pixel);
-
 }
 
 
@@ -667,4 +633,37 @@ void otsu_function(int width, int heigth, uint16_t* pixel)
             threshold = i;
         }
 	}
+}
+
+void image_data_analysis(uint16_t width, uint16_t height, int x0, int y0, int w, int h, uint8_t *jpeg_buf)
+{
+	uint8_t state = 0;
+	uint8_t cCharState = 0;
+	uint8_t tCharState = 0;
+	image_rollovers(IMAGE_WIDTH, IMAGE_HIGHT, (uint8_t*)jpeg_buf);  //向左翻转图像
+	rgb565_to_gray(IMAGE_HIGHT, IMAGE_WIDTH, (uint8_t*)jpeg_buf);  //rgb转灰度
+	histogram_distribution(IMAGE_HIGHT, IMAGE_WIDTH, X_START, Y_START, X_WIDTH, Y_HIGHT, (uint8_t*)jpeg_buf);  //寻找二值化阈值
+	gray_to_bin(IMAGE_HIGHT, IMAGE_WIDTH, X_START, Y_START, X_WIDTH, Y_HIGHT, (uint8_t*)jpeg_buf);   //C T二值化
+	state = char_location(IMAGE_HIGHT, IMAGE_WIDTH, X_START, Y_START, X_WIDTH, Y_HIGHT, (uint8_t*)jpeg_buf);  //定位C T位置
+	if(state == 1)
+	{
+		cCharState = c_gray_value_statistics(IMAGE_HIGHT, IMAGE_WIDTH, X_START, Y_START, X_WIDTH, Y_HIGHT, (uint8_t*)jpeg_buf);  //C字符横线  灰度值分析
+		tCharState = t_gray_value_statistics(IMAGE_HIGHT, IMAGE_WIDTH, X_START, Y_START, X_WIDTH, Y_HIGHT, (uint8_t*)jpeg_buf);  //T字符横线  灰度值分析
+		if(cCharState == 0)    //无效
+		{
+			lcd_display_16x16_char(4, 60, 'i');
+		}
+		else if(cCharState == 1 && tCharState == 0)  //阴性
+		{
+			lcd_display_16x16_char(4, 60, '-');
+		}
+		else if(cCharState == 1 && tCharState == 1)   //阳性
+		{
+			lcd_display_16x16_char(4, 60, '+');
+		}
+	}
+	else   //定位失败
+	{
+		lcd_display_16x16_char(4, 60, 'e');
+	}	
 }

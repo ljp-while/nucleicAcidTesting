@@ -184,7 +184,7 @@ void display_time_date(void)
 {
 	RTC_GetTime(RTC_Format_BIN,&RTC_TimeStruct);
 	sprintf((char *)buf,"Time: %.2d:%.2d:%.2d",RTC_TimeStruct.RTC_Hours,RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds);
-	printf("%s\r\n",buf);
+	_DEBUG_PRINT_("%s\r\n",buf);
 //	LCD_ShowString(0,420,320,16,16,buf);  	  
 	RTC_GetDate(RTC_Format_BIN,&RTC_DateStruct);
 	sprintf((char *)buf,"Date: 20%d-%.2d-%.2d  Day %d",RTC_DateStruct.RTC_Year,RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_DateStruct.RTC_WeekDay);

@@ -30,7 +30,7 @@ void DMA2_Stream1_IRQHandler(void)
     if (DMA_GetITStatus(DMA2_Stream1, DMA_IT_TCIF1) == SET)  
     {
 //		TIM_Cmd(TIM3,DISABLE); //使能定时器3
-//		printf("%d %d\r\n", dcmiDataCount,TIM3->CNT);
+//		_DEBUG_PRINT_("%d %d\r\n", dcmiDataCount,TIM3->CNT);
 		uint32_t *p;
 		if(DMA_GetCurrentMemoryTarget(DMA2_Stream1) == DMA_Memory_0)
 		{

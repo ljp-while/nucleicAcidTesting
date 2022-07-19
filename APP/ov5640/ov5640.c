@@ -1,9 +1,6 @@
 #include "ov5640.h"
 #include "ov5640cfg.h"
-#include "ov5640af.h"
-#include "time.h"	  
-#include "SysTick.h"
-#include "usart.h"			 
+#include "ov5640af.h"		 
 #include "sccb.h"	 
 
 
@@ -72,7 +69,7 @@ uint8_t ov5640_init(void)
 	reg|=OV5640_RD_Reg(OV5640_CHIPIDL);	//∂¡»°ID µÕ∞ÀŒª
 	if(reg!=OV5640_ID)
 	{
-		printf("ID:%d\r\n",reg);
+		_DEBUG_PRINT_("ID:%d\r\n",reg);
 		return 1;
 	}  
 	

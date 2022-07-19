@@ -42,9 +42,6 @@ void TIM3_IRQHandler(void)
 {
 	if(TIM_GetITStatus(TIM3,TIM_IT_Update)==SET) //溢出中断
 	{
-//		printf("frame:%d\r\n",ov_frame);//打印帧率
-//		printf("jpeg_data_len:%d\r\n",jpeg_data_len);
-		//ov_frame=0;
 	}
 	TIM_ClearITPendingBit(TIM3,TIM_IT_Update);  //清除中断标志位
 }

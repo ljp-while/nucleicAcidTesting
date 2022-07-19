@@ -53,8 +53,9 @@ void TIM5_IRQHandler(void)
 		{
 			time5Info.timeCount = 0;
 			time5Info.succeedFlag = 1;
+			currentMode.autoMode = 1;
 			time5_disable();
-			printf("%d ok\r\n",TIME_VALUE_MAX);
+			_DEBUG_PRINT_("%d ok\r\n",TIME_VALUE_MAX);
 		}
 	}
 	TIM_ClearITPendingBit(TIM5,TIM_IT_Update);	

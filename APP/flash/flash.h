@@ -1,7 +1,7 @@
 #ifndef _flash_H
 #define _flash_H
 
-#include "system.h"
+#include "main.h"
 
 #define W25Q128_SECTION_LENGTH 4096
 #define OVERTURN_IMAGE_ADDRESS 40*W25Q128_SECTION_LENGTH

@@ -1,7 +1,6 @@
 #ifndef _OV5640_H
 #define _OV5640_H
-#include "system.h"
-#include "sccb.h"
+#include "main.h"	 
 
 
 //#define OV5640_PWDN  	PGout(9)			//POWER DOWN¿ØÖÆÐÅºÅ

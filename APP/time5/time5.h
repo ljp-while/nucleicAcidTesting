@@ -4,7 +4,7 @@
 
 #include "main.h"
 
-#define TIME_VALUE_MAX  1*60*15  //1*60*15√Î
+#define TIME_VALUE_MAX  1*30*1  //1*60*15√Î
 
 typedef struct{
 	uint16_t timeCount;

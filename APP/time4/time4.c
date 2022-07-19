@@ -1,5 +1,6 @@
 #include "time4.h"
-#include "powerKey.h"
+
+extern uint8_t manualFlag;
 
 void time4_init(uint16_t per,uint16_t psc)
 {
@@ -42,30 +43,34 @@ void TIM4_IRQHandler(void)
 		}
 		if(powerKeyMes.timeCount > PROCESS_TIMES_MAX)
 		{
-			printf("powerKeyMes.risingCount = %d  powerKeyMes.fallingCount = %d\r\n",powerKeyMes.risingCount,powerKeyMes.fallingCount);
 			if(powerKeyMes.fallingCount == KEY_PRESS_COUNT_TWO)
 			{
-				printf("连续自检模式\r\n");
+				_DEBUG_PRINT_("立即检测模式\r\n");
 				memset(&powerKeyMes, 0, sizeof(powerKeyMes));
 				TIM_Cmd(TIM4,DISABLE); //关闭定时器4
+				currentMode.manualMode = 1;
+				currentMode.autoMode = 0;
 			}
 			else if((powerKeyMes.lowLevelTime > LOW_LEVEL_TIMES_MAX) && (powerKeyMes.risingCount == 0))
 			{
 				GPIO_ResetBits(POWER_CONTROL_PIN_PORT,POWER_CONTROL_PIN);
-				printf("关机处理\r\n");
+				_DEBUG_PRINT_("关机处理\r\n");
 				memset(&powerKeyMes, 0, sizeof(powerKeyMes));
 				TIM_Cmd(TIM4,DISABLE); //关闭定时器4
 			}	
 			else if(powerKeyMes.fallingCount == KEY_PRESS_COUNT_ONE)
 			{
-				printf("自动检测模式\r\n");
+				_DEBUG_PRINT_("自动检测模式\r\n");
 				time5_enble();
 				memset(&powerKeyMes, 0, sizeof(powerKeyMes));
-				TIM_Cmd(TIM4,DISABLE); //关闭定时器4				
+				TIM_Cmd(TIM4,DISABLE); //关闭定时器4	
+				currentMode.manualMode = 0;				
+				currentMode.autoMode = 0;		
+				manualFlag = 0;
 			}
 			else
 			{
-				printf("pass\r\n");
+				_DEBUG_PRINT_("pass\r\n");
 				memset(&powerKeyMes, 0, sizeof(powerKeyMes));
 				TIM_Cmd(TIM4,DISABLE); //关闭定时器4				
 			}
